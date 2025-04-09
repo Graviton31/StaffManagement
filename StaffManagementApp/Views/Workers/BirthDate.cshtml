@@ -1,0 +1,44 @@
+﻿@model IEnumerable<StaffManagement.ModelsDto.WorkerBirthDateDto>
+
+@{
+    ViewData["Title"] = "Ближайшие дни рождения";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Аватар</th>
+            <th>Сотрудник</th>
+            <th>День недели</th>
+            <th>Дата рождения</th>
+            <th>Следующий день рождения</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var worker in Model)
+        {
+            <tr>
+                <td>
+                    @if (worker.Avatar != null)
+                    {
+                        <img src="@worker.Avatar" alt="Avatar" style="width:50px;height:50px;" />
+                    }
+                    else
+                    {
+                        <text>Нет аватара</text>
+                    }
+                </td>
+                <td>@worker.FullWorkerName</td>
+                <td>@worker.DayOfWeekThisYear</td>
+                <td>@worker.BirthDayMonthAndDay</td>
+                <td>@worker.NextBirthDay.ToString("dd.MM.yyyy")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <a asp-action="Index" class="btn btn-secondary">Назад к списку</a>
+</div>

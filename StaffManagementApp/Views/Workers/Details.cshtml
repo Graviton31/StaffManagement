@@ -1,0 +1,113 @@
+﻿@model StaffManagementApi.Models.VwWorkerDetail
+
+@{
+    ViewData["Title"] = "Подробная информация";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="card">
+    <div class="card-header">
+        <h4>Информация о работнике</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <h5>Аватар</h5>
+                <div>
+                    @if (!string.IsNullOrEmpty(Model.Avatar))
+                    {
+                        <img src="@Model.Avatar" alt="Avatar" class="img-fluid" style="max-width: 100px; max-height: 100px; border: 1px solid #ccc; border-radius: 5px;" />
+                    }
+                    else
+                    {
+                        <text>Нет аватара</text>
+                    }
+                </div>
+            </div>
+            <div class="col-md-4">
+                <h5>ФИО</h5>
+                <p>@Model.FullWorkerName</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Дата рождения</h5>
+                <p>@Model.BirthDate.ToString("dd.MM.yyyy")</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <h5>Телефон</h5>
+                <p>@Model.Phone</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Email</h5>
+                <p>@Model.WorkEmail</p>
+			</div>
+            <div class="col-md-4">
+				<h5>Номер ПК</h5>
+				<p>@Model.PcNumber</p>
+			</div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <h5>Должность</h5>
+                <p>@Model.Post</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Отдел</h5>
+                <p>@Model.Department</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Заработная плата</h5>
+                <p>@Model.Salary</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <h5>Обязанности</h5>
+                <p>@Model.Duties</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Дата начала статуса</h5>
+                <p>@(Model.StartDateStatus?.ToString("dd.MM.yyyy") ?? "Не указана")</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Дата окончания статуса</h5>
+                <p>@(Model.EndDateStatus?.ToString("dd.MM.yyyy") ?? "Не указана")</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <h5>Комната</h5>
+                <p>@Model.Room</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Этаж</h5>
+                <p>@Model.Floor</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Офис</h5>
+                <p>@Model.Office</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <h5>Статус</h5>
+                <p>@Model.Name</p> 
+            </div>
+            <div class="col-md-4">
+                <h5>Дата начала условий труда</h5>
+                <p>@(Model.StartDateWorkingConditions?.ToString("dd.MM.yyyy") ?? "Не указана")</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Дата окончания условий труда</h5>
+                @(Model.EndDateWorkingConditions?.ToString("dd.MM.yyyy") ?? "Не указана")</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card-footer text-right">
+    <a asp-action="Edit" asp-route-id="@Model.IdWorker" class="btn btn-primary">Редактировать</a>
+    <a asp-action="Index" class="btn btn-secondary">Назад к списку</a>
+</div>
+

@@ -15,18 +15,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Добавьте CORS
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowSpecificOrigin",
-        builder =>
-        {
-            builder.WithOrigins("http://localhost:5218") // URL клиента
-                   .AllowAnyMethod()
-                   .AllowAnyHeader();
-        });
-});
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

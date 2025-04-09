@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using StaffManagementApi.Data;
 using StaffManagementApi.Models;
-using StaffManagemet.ModelsDto;
+using StaffManagement.ModelsDto;
 
 namespace StaffManagement.Controllers
 {
@@ -46,7 +46,8 @@ namespace StaffManagement.Controllers
             var workersWithBirthDate = workers.Select(w => new WorkerBirthDateDto
             {
                 Id = w.IdWorker,
-                Name = w.FullWorkerName,
+                Avatar = w.Avatar,
+                FullWorkerName = w.FullWorkerName,
                 // Рассчитываем дату и день недели дня рождения в этом году или следующем
                 BirthDayMonthAndDay = GetBirthDayMonthAndDay(w.BirthDate),
                 DayOfWeekThisYear = GetDayOfWeekThisYear(w.BirthDate),

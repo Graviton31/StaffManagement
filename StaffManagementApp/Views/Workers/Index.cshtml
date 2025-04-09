@@ -1,0 +1,48 @@
+﻿@model IEnumerable<StaffManagementApi.Models.VwWorkerInfo>
+
+@{
+    ViewData["Title"] = "Список сотрудников";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Аватар</th>
+            <th>ФИО</th>
+            <th>Должность</th>
+            <th>Отдел</th>
+            <th>Дата рождения</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var worker in Model)
+        {
+            <tr>
+                <td>
+                    @if (worker.Avatar != null)
+                    {
+                        <img src="@worker.Avatar" alt="Avatar" style="width:50px;height:50px;" />
+                    }
+                    else
+                    {
+                        <text>Нет аватара</text>
+                    }
+                </td>
+                <td>@worker.FullWorkerName</td>
+                <td>@(worker.Post ?? "Не указана")</td>
+                <td>@(worker.Department ?? "Не указан")</td>
+                <td>@(worker.BirthDate.ToString("dd.MM.yyyy"))</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@worker.IdWorker" class="btn btn-info">Подробнее</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <a asp-action="BirthDate" class="btn btn-primary">Посмотреть дни рождения</a>
+</div>

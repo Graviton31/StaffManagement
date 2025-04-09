@@ -1,4 +1,4 @@
-﻿namespace StaffManagemet.ModelsDto
+﻿namespace StaffManagement.ModelsDto
 {
     public class RefreshTokenDto
     {
