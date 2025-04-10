@@ -194,6 +194,7 @@ public partial class ContextStaffManagement : DbContext
                 .HasColumnName("floor");
             entity.Property(e => e.FullWorkerName)
                 .HasMaxLength(137)
+                .HasDefaultValueSql("''")
                 .HasColumnName("full_worker_name");
             entity.Property(e => e.IdWorker).HasColumnName("id_worker");
             entity.Property(e => e.Name)
@@ -206,7 +207,7 @@ public partial class ContextStaffManagement : DbContext
                 .HasMaxLength(15)
                 .HasColumnName("pc_number");
             entity.Property(e => e.Phone)
-                .HasMaxLength(15)
+                .HasMaxLength(20)
                 .HasColumnName("phone");
             entity.Property(e => e.Post)
                 .HasMaxLength(50)
@@ -237,6 +238,7 @@ public partial class ContextStaffManagement : DbContext
                 .HasColumnName("department");
             entity.Property(e => e.FullWorkerName)
                 .HasMaxLength(137)
+                .HasDefaultValueSql("''")
                 .HasColumnName("full_worker_name");
             entity.Property(e => e.IdWorker).HasColumnName("id_worker");
             entity.Property(e => e.Post)
@@ -257,7 +259,9 @@ public partial class ContextStaffManagement : DbContext
                 .HasMaxLength(60)
                 .HasColumnName("avatar");
             entity.Property(e => e.BirthDate).HasColumnName("birth_date");
-            entity.Property(e => e.IdRole).HasColumnName("id_role");
+            entity.Property(e => e.IdRole)
+                .HasDefaultValueSql("'1'")
+                .HasColumnName("id_role");
             entity.Property(e => e.IsDeleted).HasColumnName("is_deleted");
             entity.Property(e => e.Name)
                 .HasMaxLength(45)
@@ -269,7 +273,7 @@ public partial class ContextStaffManagement : DbContext
                 .HasMaxLength(15)
                 .HasColumnName("pc_number");
             entity.Property(e => e.Phone)
-                .HasMaxLength(15)
+                .HasMaxLength(20)
                 .HasColumnName("phone");
             entity.Property(e => e.Surname)
                 .HasMaxLength(45)
@@ -280,7 +284,6 @@ public partial class ContextStaffManagement : DbContext
 
             entity.HasOne(d => d.IdRoleNavigation).WithMany(p => p.Workers)
                 .HasForeignKey(d => d.IdRole)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("id_role");
         });
 
@@ -334,17 +337,14 @@ public partial class ContextStaffManagement : DbContext
 
             entity.HasOne(d => d.IdFloorNavigation).WithMany(p => p.Workspaces)
                 .HasForeignKey(d => d.IdFloor)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_workspaces_floors1");
 
             entity.HasOne(d => d.IdOfficeNavigation).WithMany(p => p.Workspaces)
                 .HasForeignKey(d => d.IdOffice)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_workspaces_offices1");
 
             entity.HasOne(d => d.IdRoomNavigation).WithMany(p => p.Workspaces)
                 .HasForeignKey(d => d.IdRoom)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_workspaces_rooms1");
 
             entity.HasOne(d => d.IdWorkerNavigation).WithMany(p => p.Workspaces)
