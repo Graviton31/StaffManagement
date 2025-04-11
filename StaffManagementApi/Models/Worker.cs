@@ -25,9 +25,9 @@ public partial class Worker
 
     public sbyte IsDeleted { get; set; }
 
-    public int IdRole { get; set; }
+    public int? IdRole { get; set; }
 
-    public virtual Role IdRoleNavigation { get; set; } = null!;
+    public virtual Role? IdRoleNavigation { get; set; }
 
     public virtual ICollection<StatusesWorker> StatusesWorkers { get; set; } = new List<StatusesWorker>();
 

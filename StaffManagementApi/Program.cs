@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using StaffManagementApi.Data; 
+using StaffManagementApi.Data;
+using StaffManagementApi.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,10 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 // Добавление контекста базы данных с использованием строки подключения
 builder.Services.AddDbContext<ContextStaffManagement>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"), ServerVersion.Parse("8.0.19-mysql")));
+
+// Добавьте эту строку в раздел с другими сервисами
+builder.Services.AddScoped<ExcelImportService>();
+builder.Services.AddScoped<IExcelReportService, ExcelReportService>();
 
 // Add services to the container.
 builder.Services.AddControllers();
