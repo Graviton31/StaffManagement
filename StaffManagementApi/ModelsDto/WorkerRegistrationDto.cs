@@ -1,12 +1,14 @@
 ﻿namespace StaffManagement.ModelsDto
 {
-    public class UserRegistrationDto
+    public class WorkerRegistrationDto
     {
-        public string Name { get; set; } = null!;
-        public string Surname { get; set; } = null!;
+        public string WorkEmail { get; set; }
+        public string Password { get; set; }
+        public string Name { get; set; }
+        public string Surname { get; set; }
         public string? Patronymic { get; set; }
-        public string Login { get; set; } = null!;
-        public string Password { get; set; } = null!;
-        public bool? IsAdmin { get; set; }
+        public DateOnly BirthDate { get; set; }
+        public string? Phone { get; set; }
+        public int? IdRole { get; set; }
     }
 }

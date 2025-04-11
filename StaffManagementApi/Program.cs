@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using StaffManagementApi.Data;
 using StaffManagementApi.Interfaces;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +13,32 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 // Добавление контекста базы данных с использованием строки подключения
 builder.Services.AddDbContext<ContextStaffManagement>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"), ServerVersion.Parse("8.0.19-mysql")));
+
+// Настройка аутентификации JWT
+var key = builder.Configuration["JwtSettings:SecretKey"]; // Секретный ключ для JWT
+
+if (string.IsNullOrEmpty(key))
+{
+    throw new Exception("Секретный ключ JWT не настроен в appsettings.json");
+}
+
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(x =>
+{
+    x.RequireHttpsMetadata = false; // Установите false для целей разработки
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)), // Секретный ключ для подписи токена
+        ValidateIssuer = false, // Установите true, если необходимо проверять издателя токена
+        ValidateAudience = false // Установите true, если необходимо проверять аудиторию токена
+    };
+});
 
 // Добавьте эту строку в раздел с другими сервисами
 builder.Services.AddScoped<ExcelImportService>();

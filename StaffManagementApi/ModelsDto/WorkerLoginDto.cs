@@ -1,8 +1,8 @@
 ﻿namespace StaffManagement.ModelsDto
 {
-    public class UserLoginDto
+    public class WorkerLoginDto
     {
-        public string Login { get; set; } = null!;
-        public string Password { get; set; } = null!;
+        public string WorkEmail { get; set; }
+        public string Password { get; set; }
     }
 }
