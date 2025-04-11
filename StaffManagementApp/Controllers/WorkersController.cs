@@ -14,15 +14,15 @@ namespace StaffManagementApp.Controllers
             _httpClient = clientFactory.CreateClient("ApiClient");
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10)
         {
             try
             {
-                var response = await _httpClient.GetAsync("api/Workers");
+                var response = await _httpClient.GetAsync($"api/Workers?pageNumber={pageNumber}&pageSize={pageSize}");
                 if (response.IsSuccessStatusCode)
                 {
-                    var vwWorkerInfo = await response.Content.ReadFromJsonAsync<IEnumerable<VwWorkerInfo>>();
-                    return View(vwWorkerInfo);
+                    var pagedResponse = await response.Content.ReadFromJsonAsync<PagedResponse<VwWorkerInfo>>();
+                    return View(pagedResponse);
                 }
                 else
                 {
@@ -34,7 +34,7 @@ namespace StaffManagementApp.Controllers
                 Console.WriteLine($"Ошибка: {ex.Message}");
             }
 
-            return View(new List<VwWorkerInfo>());
+            return View(new PagedResponse<VwWorkerInfo> { Data = new List<VwWorkerInfo>() });
         }
 
 
