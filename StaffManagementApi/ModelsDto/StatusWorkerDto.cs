@@ -1,4 +1,4 @@
-﻿namespace StaffManagement.ModelsDto
+﻿namespace StaffManagementApi.ModelsDto
 {
     public class StatusWorkerDto
     {

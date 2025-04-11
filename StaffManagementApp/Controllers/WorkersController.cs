@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StaffManagementApi.Models;
-using StaffManagement.ModelsDto;
+using StaffManagementApi.ModelsDto;
 using System.Text.Json;
 
 namespace StaffManagementApp.Controllers
