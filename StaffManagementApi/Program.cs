@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using StaffManagementApi.Data; 
+using StaffManagementApi.Data;
+using StaffManagementApi.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ builder.Services.AddDbContext<ContextStaffManagement>(options =>
 
 // Добавьте эту строку в раздел с другими сервисами
 builder.Services.AddScoped<ExcelImportService>();
+builder.Services.AddScoped<IExcelReportService, ExcelReportService>();
 
 // Add services to the container.
 builder.Services.AddControllers();

@@ -9,7 +9,7 @@ public partial class VwWorkerInfo
 
     public string? Avatar { get; set; }
 
-    public string FullWorkerName { get; set; } = null!;
+    public string? FullWorkerName { get; set; }
 
     public string? Post { get; set; }
 

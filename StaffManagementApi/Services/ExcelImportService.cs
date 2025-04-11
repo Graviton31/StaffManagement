@@ -198,7 +198,6 @@ public class ExcelImportService
                 else
                 {
                     // Создаем новое рабочее место с минимальными данными
-                    // (предполагаем, что office, floor, room с ID=1 существуют)
                     workspace = new Workspace
                     {
                         Name = workerData.WorkspaceName,

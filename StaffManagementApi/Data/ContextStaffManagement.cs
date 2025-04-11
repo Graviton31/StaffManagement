@@ -194,7 +194,6 @@ public partial class ContextStaffManagement : DbContext
                 .HasColumnName("floor");
             entity.Property(e => e.FullWorkerName)
                 .HasMaxLength(137)
-                .HasDefaultValueSql("''")
                 .HasColumnName("full_worker_name");
             entity.Property(e => e.IdWorker).HasColumnName("id_worker");
             entity.Property(e => e.Name)
@@ -221,6 +220,9 @@ public partial class ContextStaffManagement : DbContext
             entity.Property(e => e.WorkEmail)
                 .HasMaxLength(30)
                 .HasColumnName("work_email");
+            entity.Property(e => e.Workspace)
+                .HasMaxLength(45)
+                .HasColumnName("workspace");
         });
 
         modelBuilder.Entity<VwWorkerInfo>(entity =>
@@ -238,7 +240,6 @@ public partial class ContextStaffManagement : DbContext
                 .HasColumnName("department");
             entity.Property(e => e.FullWorkerName)
                 .HasMaxLength(137)
-                .HasDefaultValueSql("''")
                 .HasColumnName("full_worker_name");
             entity.Property(e => e.IdWorker).HasColumnName("id_worker");
             entity.Property(e => e.Post)

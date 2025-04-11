@@ -9,7 +9,7 @@ public partial class VwWorkerDetail
 
     public string? Avatar { get; set; }
 
-    public string FullWorkerName { get; set; } = null!;
+    public string? FullWorkerName { get; set; }
 
     public DateOnly BirthDate { get; set; }
 
@@ -32,6 +32,8 @@ public partial class VwWorkerDetail
     public string? Department { get; set; }
 
     public string? Room { get; set; }
+
+    public string? Workspace { get; set; }
 
     public string? Floor { get; set; }
 
