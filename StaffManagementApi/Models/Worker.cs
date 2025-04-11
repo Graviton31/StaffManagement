@@ -27,6 +27,10 @@ public partial class Worker
 
     public int? IdRole { get; set; }
 
+    public byte[] Password { get; set; } = null!;
+
+    public string? Token { get; set; }
+
     public virtual Role? IdRoleNavigation { get; set; }
 
     public virtual ICollection<StatusesWorker> StatusesWorkers { get; set; } = new List<StatusesWorker>();

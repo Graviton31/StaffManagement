@@ -194,6 +194,7 @@ public partial class ContextStaffManagement : DbContext
                 .HasColumnName("floor");
             entity.Property(e => e.FullWorkerName)
                 .HasMaxLength(137)
+                .HasDefaultValueSql("''")
                 .HasColumnName("full_worker_name");
             entity.Property(e => e.IdWorker).HasColumnName("id_worker");
             entity.Property(e => e.Name)
@@ -240,6 +241,7 @@ public partial class ContextStaffManagement : DbContext
                 .HasColumnName("department");
             entity.Property(e => e.FullWorkerName)
                 .HasMaxLength(137)
+                .HasDefaultValueSql("''")
                 .HasColumnName("full_worker_name");
             entity.Property(e => e.IdWorker).HasColumnName("id_worker");
             entity.Property(e => e.Post)
@@ -267,6 +269,10 @@ public partial class ContextStaffManagement : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(45)
                 .HasColumnName("name");
+            entity.Property(e => e.Password)
+                .HasMaxLength(32)
+                .IsFixedLength()
+                .HasColumnName("password");
             entity.Property(e => e.Patronymic)
                 .HasMaxLength(45)
                 .HasColumnName("patronymic");
@@ -279,6 +285,9 @@ public partial class ContextStaffManagement : DbContext
             entity.Property(e => e.Surname)
                 .HasMaxLength(45)
                 .HasColumnName("surname");
+            entity.Property(e => e.Token)
+                .HasMaxLength(255)
+                .HasColumnName("token");
             entity.Property(e => e.WorkEmail)
                 .HasMaxLength(30)
                 .HasColumnName("work_email");
