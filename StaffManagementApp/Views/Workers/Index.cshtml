@@ -6,38 +6,38 @@
 
 <style>
     .pagination .page-item.active .page-link {
-        background-color: #0057a6;
-        border-color: #0057a6;
+    background-color: #0057a6;
+    border-color: #0057a6;
     }
 
     .pagination .page-link {
-        color: #0057a6;
+    color: #0057a6;
     }
 
-        .pagination .page-link:hover {
-            color: #003366;
-            background-color: #e1f0fb;
-        }
+    .pagination .page-link:hover {
+    color: #003366;
+    background-color: #e1f0fb;
+    }
 
     .no-avatar {
-        font-size: 0.8em;
-        text-align: center;
+    font-size: 0.8em;
+    text-align: center;
     }
 
     .action-buttons {
-        margin-bottom: 20px;
-        display: flex;
-        gap: 10px;
-        justify-content: flex-end;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
     }
 
     .tooltip-inner {
-        background-color: #0057a6;
-        color: white;
+    background-color: #0057a6;
+    color: white;
     }
 
     .bs-tooltip-top .tooltip-arrow::before {
-        border-top-color: #0057a6;
+    border-top-color: #0057a6;
     }
 </style>
 
@@ -46,18 +46,18 @@
 
     <div class="d-flex align-items-center gap-2">
 
-    <a asp-action="UploadData" class="btn btn-outline-primary">
-        <i class="bi bi-upload"></i> Загрузить данные
-    </a>
-    <a asp-action="GenerateReport" class="btn btn-outline-success">
-        <i class="bi bi-file-earmark-bar-graph"></i> Создать отчёт
-    </a>
-    <a asp-action="BirthDate"
-       class="btn btn-primary"
-       data-bs-toggle="tooltip"
-       data-bs-title="Просмотр ближайших дней рождений">
-        <i class="bi bi-gift"></i>
-    </a>
+        <a asp-action="UploadData" class="btn btn-outline-primary">
+            <i class="bi bi-upload"></i> Загрузить данные
+        </a>
+        <a asp-action="GenerateReport" class="btn btn-outline-success">
+            <i class="bi bi-file-earmark-bar-graph"></i> Создать отчёт
+        </a>
+        <a asp-action="BirthDate"
+        class="btn btn-primary"
+        data-bs-toggle="tooltip"
+        data-bs-title="Просмотр ближайших дней рождений">
+            <i class="bi bi-gift"></i>
+        </a>
     </div>
 </div>
 
@@ -79,11 +79,13 @@
                 <td>
                     @if (!string.IsNullOrEmpty(worker.Avatar))
                     {
-                        <img src="@worker.Avatar" alt="Avatar" class="rounded-circle" style="width:50px;height:50px;" />
+                        <img src="http://localhost:5298/images/@worker.Avatar"
+                             alt="Аватар"
+                             style="width: 50px; height: 50px; border-radius: 50%;">
                     }
                     else
                     {
-                        <img src="@Url.Content("~/Images/Avatar.jpg")"
+                        <img src="@Url.Content("~/images/Avatar.jpg")"
                              alt="Default Avatar"
                              class="rounded-circle"
                              style="width:50px;height:50px;" />

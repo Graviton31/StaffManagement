@@ -82,29 +82,52 @@
 
     <div class="card-body">
         <div class="row mb-4">
-            <!-- Левая колонка с аватаром и персональными данными -->
-            <div class="col-md-3 personal-info-section">
-                <div class="avatar-container">
+            <div class="avatar-container">
+                <!-- Добавляем контейнер для кнопки -->
+                <div class="position-relative" style="width: 120px; height: 120px;">
                     @if (!string.IsNullOrEmpty(Model.Avatar))
                     {
-                        <img src="@Model.Avatar"
+                        <img src="http://localhost:5298/images/@Model.Avatar"
                              alt="Аватар"
                              class="avatar-img rounded-circle" />
                     }
                     else
                     {
                         <div class="avatar-img rounded-circle bg-light d-flex align-items-center justify-content-center">
-                            <i class="bi bi-person fs-1 text-muted"></i>
+                            <img src="@Url.Content("~/images/Avatar.jpg")"
+                                 alt="Default Avatar"
+                                 class="rounded-circle"
+                                 style="width:115px;height:115px;" />
                         </div>
                     }
-                    <h5 class="section-title text-center w-100">Персональные данные</h5>
-                    <div class="detail-value text-center">
-                        <div class="mb-2">@Model.BirthDate.ToString("dd.MM.yyyy")</div>
-                        <div class="mb-2">@Model.Phone</div>
-                        <div>@Model.WorkEmail</div>
-                    </div>
+
+                    <!-- Кнопка загрузки аватара -->
+                    <form id="avatarForm"
+                          action="http://localhost:5298/api/Workers/upload-avatar/@Model.IdWorker"
+                          method="post"
+                          enctype="multipart/form-data"
+                          class="position-absolute bottom-0 end-0">
+                        <input type="hidden" name="workerId" value="@Model.IdWorker" />
+                        <label class="btn btn-primary btn-sm rounded-circle shadow-sm"
+                               style="width: 32px; height: 32px;"
+                               title="Загрузить аватар">
+                            <i class="bi bi-plus"></i>
+                            <input type="file"
+                                   name="file"
+                                   accept=".jpg,.jpeg,.png"
+                                   style="display: none;"
+                                   onchange="uploadAvatar(this)">
+                        </label>
+                    </form>
+
                 </div>
-                <hr class="divider">
+
+                <h5 class="section-title text-center w-100">Персональные данные</h5>
+                <div class="detail-value text-center">
+                    <div class="mb-2">@Model.BirthDate.ToString("dd.MM.yyyy")</div>
+                    <div class="mb-2">@Model.Phone</div>
+                    <div>@Model.WorkEmail</div>
+                </div>
             </div>
 
             <!-- Правая колонка с рабочей информацией -->
@@ -146,15 +169,6 @@
                 <!-- Блок с рабочей информацией -->
                 <div class="row">
                     <div class="col-md-6">
-                        <h5 class="section-title">Рабочее место</h5>
-                        <div class="detail-value">
-                            <div class="mb-2">@Model.Office</div>
-                            <div class="mb-2">Этаж @Model.Floor, Каб. @Model.Room</div>
-                            <div>ПК №@Model.PcNumber</div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
                         <h5 class="section-title">Текущий статус</h5>
                         <div class="detail-value">
                             @if (!string.IsNullOrEmpty(Model.Name))
@@ -187,3 +201,46 @@
         </a>
     </div>
 </div>
+
+<script>
+    async function uploadAvatar(input) {
+        const form = document.getElementById('avatarForm');
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData
+            });
+
+            const responseText = await response.text(); // Читаем ответ как текст для отладки
+            console.log("Raw response:", responseText);
+
+            if (!response.ok) {
+                alert("Ошибка: " + response.statusText);
+                return;
+            }
+
+            // Пытаемся распарсить ответ как JSON
+            let result;
+            try {
+                result = JSON.parse(responseText);
+            } catch (e) {
+                console.error("Ошибка парсинга JSON:", e);
+                alert("Аватар обновлен. Страница будет перезагружена.");
+                window.location.reload();
+                return;
+            }
+
+            // Проверяем наличие сообщения (с учетом регистра)
+            const successMessage = result.message || result.Message || "Аватар успешно обновлен";
+            alert(successMessage);
+
+            window.location.reload();
+
+        } catch (error) {
+            console.error("Ошибка при загрузке аватара:", error);
+            alert("Произошла ошибка при загрузке аватара.");
+        }
+    }
+</script>

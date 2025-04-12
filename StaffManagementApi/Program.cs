@@ -70,6 +70,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseStaticFiles(); // Разрешает доступ к wwwroot
+
 // Правильный порядок middleware
 app.UseRouting();
 app.UseCors("AllowSpecificOrigin");

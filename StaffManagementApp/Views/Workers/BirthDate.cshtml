@@ -53,14 +53,13 @@
                 <td>
                     @if (!string.IsNullOrEmpty(worker.Avatar))
                     {
-                        <img src="@worker.Avatar"
-                             alt="Avatar"
-                             class="rounded-circle"
-                             style="width:50px;height:50px;" />
+                        <img src="http://localhost:5298/images/@worker.Avatar"
+                             alt="Аватар"
+                             style="width: 50px; height: 50px; border-radius: 50%;">
                     }
                     else
                     {
-                        <img src="@Url.Content("~/Images/Avatar.jpg")"
+                        <img src="@Url.Content("~/images/Avatar.jpg")"
                              alt="Default Avatar"
                              class="rounded-circle"
                              style="width:50px;height:50px;" />
