@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -27,6 +28,12 @@ namespace backend.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] WorkerRegistrationDto registrationDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Проверка уникальности по ФИО и дате рождения
             var existingWorker = await _context.Workers
                 .FirstOrDefaultAsync(w =>
                     w.Name == registrationDto.Name &&
@@ -39,15 +46,20 @@ namespace backend.Controllers
                 return BadRequest("Работник с такими ФИО и датой рождения уже существует.");
             }
 
-            var credentialHasher = new CredentialHasher();
-            credentialHasher.SetCredentials(registrationDto.WorkEmail, registrationDto.Password);
+            // Проверка уникальности email
+            if (await _context.Workers.AnyAsync(w => w.WorkEmail == registrationDto.WorkEmail))
+            {
+                return BadRequest("Email уже зарегистрирован.");
+            }
 
-            byte[] hashedPassword = credentialHasher.HashCredentials();
+            // Хеширование пароля с использованием надежной библиотеки
+            var hasher = new PasswordHasher<Worker>();
+            var hashedPassword = hasher.HashPassword(null, registrationDto.Password);
 
             var newWorker = new Worker
             {
                 WorkEmail = registrationDto.WorkEmail,
-                Password = hashedPassword,
+                Password = hashedPassword, // Сохраняем хеш пароля как строку
                 Name = registrationDto.Name,
                 Surname = registrationDto.Surname,
                 Patronymic = registrationDto.Patronymic,
@@ -65,20 +77,25 @@ namespace backend.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] WorkerLoginDto loginDto)
         {
+            Console.WriteLine("API/Login");
             try
             {
                 var worker = await _context.Workers
-                    .Include(w => w.IdRoleNavigation)
-                    .FirstOrDefaultAsync(w => w.WorkEmail == loginDto.WorkEmail);
+            .Include(w => w.IdRoleNavigation)
+            .FirstOrDefaultAsync(w => w.WorkEmail == loginDto.WorkEmail);
 
                 if (worker == null)
                 {
+                    Console.WriteLine("Неверный email или пароль.\"");
                     return Unauthorized("Неверный email или пароль.");
                 }
 
-                var credentialHasher = new CredentialHasher();
-                if (!credentialHasher.VerifyPassword(loginDto.Password, worker.Password, loginDto.WorkEmail))
+                var hasher = new PasswordHasher<Worker>();
+                var result = hasher.VerifyHashedPassword(worker, worker.Password, loginDto.Password);
+
+                if (result == PasswordVerificationResult.Failed)
                 {
+                    Console.WriteLine("Неверный email или пароль.");
                     return Unauthorized("Неверный email или пароль.");
                 }
 

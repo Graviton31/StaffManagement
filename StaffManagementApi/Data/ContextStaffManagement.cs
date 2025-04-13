@@ -19,15 +19,9 @@ public partial class ContextStaffManagement : DbContext
 
     public virtual DbSet<Department> Departments { get; set; }
 
-    public virtual DbSet<Floor> Floors { get; set; }
-
-    public virtual DbSet<Office> Offices { get; set; }
-
     public virtual DbSet<Post> Posts { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
-
-    public virtual DbSet<Room> Rooms { get; set; }
 
     public virtual DbSet<StatusesWorker> StatusesWorkers { get; set; }
 
@@ -39,7 +33,9 @@ public partial class ContextStaffManagement : DbContext
 
     public virtual DbSet<WorkingCondition> WorkingConditions { get; set; }
 
-    public virtual DbSet<Workspace> Workspaces { get; set; }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseMySql("server=localhost;database=staff_management;uid=root;pwd=root", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.19-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -59,30 +55,6 @@ public partial class ContextStaffManagement : DbContext
                 .HasColumnName("descriptions");
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
-                .HasColumnName("name");
-        });
-
-        modelBuilder.Entity<Floor>(entity =>
-        {
-            entity.HasKey(e => e.IdFloor).HasName("PRIMARY");
-
-            entity.ToTable("floors");
-
-            entity.Property(e => e.IdFloor).HasColumnName("id_floor");
-            entity.Property(e => e.Namber)
-                .HasMaxLength(45)
-                .HasColumnName("namber");
-        });
-
-        modelBuilder.Entity<Office>(entity =>
-        {
-            entity.HasKey(e => e.IdOffice).HasName("PRIMARY");
-
-            entity.ToTable("offices");
-
-            entity.Property(e => e.IdOffice).HasColumnName("id_office");
-            entity.Property(e => e.Name)
-                .HasMaxLength(45)
                 .HasColumnName("name");
         });
 
@@ -111,18 +83,6 @@ public partial class ContextStaffManagement : DbContext
             entity.Property(e => e.Description)
                 .HasMaxLength(300)
                 .HasColumnName("description");
-            entity.Property(e => e.Name)
-                .HasMaxLength(45)
-                .HasColumnName("name");
-        });
-
-        modelBuilder.Entity<Room>(entity =>
-        {
-            entity.HasKey(e => e.IdRoom).HasName("PRIMARY");
-
-            entity.ToTable("rooms");
-
-            entity.Property(e => e.IdRoom).HasColumnName("id_room");
             entity.Property(e => e.Name)
                 .HasMaxLength(45)
                 .HasColumnName("name");
@@ -185,9 +145,6 @@ public partial class ContextStaffManagement : DbContext
                 .HasColumnName("duties");
             entity.Property(e => e.EndDateStatus).HasColumnName("end_date_status");
             entity.Property(e => e.EndDateWorkingConditions).HasColumnName("end_date_working_conditions");
-            entity.Property(e => e.Floor)
-                .HasMaxLength(45)
-                .HasColumnName("floor");
             entity.Property(e => e.FullWorkerName)
                 .HasMaxLength(137)
                 .HasDefaultValueSql("''")
@@ -196,9 +153,6 @@ public partial class ContextStaffManagement : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(30)
                 .HasColumnName("name");
-            entity.Property(e => e.Office)
-                .HasMaxLength(45)
-                .HasColumnName("office");
             entity.Property(e => e.PcNumber)
                 .HasMaxLength(15)
                 .HasColumnName("pc_number");
@@ -208,18 +162,12 @@ public partial class ContextStaffManagement : DbContext
             entity.Property(e => e.Post)
                 .HasMaxLength(50)
                 .HasColumnName("post");
-            entity.Property(e => e.Room)
-                .HasMaxLength(45)
-                .HasColumnName("room");
             entity.Property(e => e.Salary).HasColumnName("salary");
             entity.Property(e => e.StartDateStatus).HasColumnName("start_date_status");
             entity.Property(e => e.StartDateWorkingConditions).HasColumnName("start_date_working_conditions");
             entity.Property(e => e.WorkEmail)
                 .HasMaxLength(30)
                 .HasColumnName("work_email");
-            entity.Property(e => e.Workspace)
-                .HasMaxLength(45)
-                .HasColumnName("workspace");
         });
 
         modelBuilder.Entity<VwWorkerInfo>(entity =>
@@ -266,8 +214,7 @@ public partial class ContextStaffManagement : DbContext
                 .HasMaxLength(45)
                 .HasColumnName("name");
             entity.Property(e => e.Password)
-                .HasMaxLength(32)
-                .IsFixedLength()
+                .HasMaxLength(255)
                 .HasColumnName("password");
             entity.Property(e => e.Patronymic)
                 .HasMaxLength(45)
@@ -316,47 +263,6 @@ public partial class ContextStaffManagement : DbContext
                 .HasForeignKey(d => d.IdWorker)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_working_conditions_workers");
-        });
-
-        modelBuilder.Entity<Workspace>(entity =>
-        {
-            entity.HasKey(e => e.IdWorkspace).HasName("PRIMARY");
-
-            entity.ToTable("workspaces");
-
-            entity.HasIndex(e => e.IdFloor, "fk_workspaces_floors1_idx");
-
-            entity.HasIndex(e => e.IdOffice, "fk_workspaces_offices1_idx");
-
-            entity.HasIndex(e => e.IdRoom, "fk_workspaces_rooms1_idx");
-
-            entity.HasIndex(e => e.IdWorker, "fk_workspaces_workers1_idx");
-
-            entity.Property(e => e.IdWorkspace).HasColumnName("id_workspace");
-            entity.Property(e => e.IdFloor).HasColumnName("id_floor");
-            entity.Property(e => e.IdOffice).HasColumnName("id_office");
-            entity.Property(e => e.IdRoom).HasColumnName("id_room");
-            entity.Property(e => e.IdWorker).HasColumnName("id_worker");
-            entity.Property(e => e.Name)
-                .HasMaxLength(45)
-                .HasColumnName("name");
-
-            entity.HasOne(d => d.IdFloorNavigation).WithMany(p => p.Workspaces)
-                .HasForeignKey(d => d.IdFloor)
-                .HasConstraintName("fk_workspaces_floors1");
-
-            entity.HasOne(d => d.IdOfficeNavigation).WithMany(p => p.Workspaces)
-                .HasForeignKey(d => d.IdOffice)
-                .HasConstraintName("fk_workspaces_offices1");
-
-            entity.HasOne(d => d.IdRoomNavigation).WithMany(p => p.Workspaces)
-                .HasForeignKey(d => d.IdRoom)
-                .HasConstraintName("fk_workspaces_rooms1");
-
-            entity.HasOne(d => d.IdWorkerNavigation).WithMany(p => p.Workspaces)
-                .HasForeignKey(d => d.IdWorker)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_workspaces_workers1");
         });
 
         OnModelCreatingPartial(modelBuilder);
