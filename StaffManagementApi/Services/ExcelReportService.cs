@@ -39,7 +39,6 @@ public class ExcelReportService : IExcelReportService
             "Дата начала статуса",
             "Дата окончания статуса",
             "Номер ПК",
-            "Рабочее место",
             "Тип особых условий",
             "Начало особых условий",
             "Окончание особых условий"
@@ -68,10 +67,9 @@ public class ExcelReportService : IExcelReportService
             SetDateCell(row, 7, worker.StartDateStatus, dateStyle);
             SetDateCell(row, 8, worker.EndDateStatus, dateStyle);    
             row.CreateCell(9).SetCellValue(worker.PcNumber);
-            row.CreateCell(10).SetCellValue(worker.Workspace);
-            row.CreateCell(11).SetCellValue(worker.Name);
-            SetDateCell(row, 12, worker.StartDateWorkingConditions, dateStyle);
-            SetDateCell(row, 13, worker.EndDateWorkingConditions, dateStyle);
+            row.CreateCell(10).SetCellValue(worker.Name);
+            SetDateCell(row, 11, worker.StartDateWorkingConditions, dateStyle);
+            SetDateCell(row, 12, worker.EndDateWorkingConditions, dateStyle);
         }
 
         // Автоподбор ширины столбцов
