@@ -1,0 +1,83 @@
+﻿@model IEnumerable<StaffManagementApi.ModelsDto.WorkerBirthDateDto>
+
+@{
+    ViewData["Title"] = "Ближайшие дни рождения";
+}
+
+<style>
+    .no-avatar {
+        font-size: 0.8em;
+        text-align: center;
+    }
+
+    .action-buttons {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+
+    .tooltip-inner {
+        background-color: #0057a6;
+        color: white;
+    }
+
+    .bs-tooltip-top .tooltip-arrow::before {
+        border-top-color: #0057a6;
+    }
+</style>
+
+<div class="action-buttons d-flex align-items-center gap-3">
+    <h2 class="flex-grow-1 m-0">@ViewData["Title"]</h2>
+    <div class="d-flex align-items-center gap-2">
+        <a asp-action="Index" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left"></i> Назад к списку
+        </a>
+    </div>
+</div>
+
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Аватар</th>
+            <th>Сотрудник</th>
+            <th>День недели</th>
+            <th>Дата рождения</th>
+            <th>Следующий день рождения</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var worker in Model)
+        {
+            <tr>
+                <td>
+                    @if (!string.IsNullOrEmpty(worker.Avatar))
+                    {
+                        <img src="http://localhost:5298/images/@worker.Avatar"
+                             alt="Аватар"
+                             style="width: 50px; height: 50px; border-radius: 50%;">
+                    }
+                    else
+                    {
+                        <img src="@Url.Content("~/images/Avatar.jpg")"
+                             alt="Default Avatar"
+                             class="rounded-circle"
+                             style="width:50px;height:50px;" />
+                    }
+                </td>
+                <td>@worker.FullWorkerName</td>
+                <td>@worker.DayOfWeekThisYear</td>
+                <td>@worker.BirthDayMonthAndDay</td>
+                <td>@worker.NextBirthDay.ToString("dd.MM.yyyy")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        // Инициализация тултипов
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    </script>
+}

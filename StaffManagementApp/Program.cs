@@ -1,7 +1,19 @@
+using Microsoft.EntityFrameworkCore;
+using StaffManagementApi.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Добавление контекста базы данных с использованием строки подключения
+builder.Services.AddDbContext<ContextStaffManagement>(options =>
+    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"), ServerVersion.Parse("8.0.19-mysql")));
+// Регистрация HttpClient
+builder.Services.AddHttpClient("ApiClient", client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5298/");
+});
 
 var app = builder.Build();
 
@@ -18,6 +30,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Workers}/{action=Index}/{id?}");
 
 app.Run();

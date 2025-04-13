@@ -1,0 +1,246 @@
+﻿@model StaffManagementApi.Models.VwWorkerDetail
+
+@{
+    ViewData["Title"] = "Подробная информация";
+}
+
+<style>
+    /* Сохраняем оригинальные стили и добавляем новые */
+    .detail-card {
+        border: 1px solid #0057a6;
+        border-radius: 8px;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #0057a6;
+    }
+
+    .avatar-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .avatar-img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border: 2px solid #dee2e6;
+        margin-bottom: 1rem;
+    }
+
+    .section-title {
+        color: #0057a6;
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .detail-value {
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+        padding: 0 0.5rem;
+    }
+
+    .divider {
+        margin: 1.5rem 0;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .status-period {
+        font-size: 0.9em;
+        color: #6c757d;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        padding: 1.25rem;
+        background-color: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .personal-info-section {
+        border-right: 2px solid #f0f0f0;
+        padding-right: 2rem;
+    }
+
+    .work-info-section {
+        padding-left: 2rem;
+    }
+</style>
+
+<div class="card detail-card">
+    <div class="card-header">
+        <h3 class="mb-0">@Model.FullWorkerName</h3>
+    </div>
+
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="avatar-container">
+                <!-- Добавляем контейнер для кнопки -->
+                <div class="position-relative" style="width: 120px; height: 120px;">
+                    @if (!string.IsNullOrEmpty(Model.Avatar))
+                    {
+                        <img src="http://localhost:5298/images/@Model.Avatar"
+                             alt="Аватар"
+                             class="avatar-img rounded-circle" />
+                    }
+                    else
+                    {
+                        <div class="avatar-img rounded-circle bg-light d-flex align-items-center justify-content-center">
+                            <img src="@Url.Content("~/images/Avatar.jpg")"
+                                 alt="Default Avatar"
+                                 class="rounded-circle"
+                                 style="width:115px;height:115px;" />
+                        </div>
+                    }
+
+                    <!-- Кнопка загрузки аватара -->
+                    <form id="avatarForm"
+                          action="http://localhost:5298/api/Workers/upload-avatar/@Model.IdWorker"
+                          method="post"
+                          enctype="multipart/form-data"
+                          class="position-absolute bottom-0 end-0">
+                        <input type="hidden" name="workerId" value="@Model.IdWorker" />
+                        <label class="btn btn-primary btn-sm rounded-circle shadow-sm"
+                               style="width: 32px; height: 32px;"
+                               title="Загрузить аватар">
+                            <i class="bi bi-plus"></i>
+                            <input type="file"
+                                   name="file"
+                                   accept=".jpg,.jpeg,.png"
+                                   style="display: none;"
+                                   onchange="uploadAvatar(this)">
+                        </label>
+                    </form>
+
+                </div>
+
+                <h5 class="section-title text-center w-100">Персональные данные</h5>
+                <div class="detail-value text-center">
+                    <div class="mb-2">@Model.BirthDate.ToString("dd.MM.yyyy")</div>
+                    <div class="mb-2">@Model.Phone</div>
+                    <div>@Model.WorkEmail</div>
+                </div>
+            </div>
+
+            <!-- Правая колонка с рабочей информацией -->
+            <div class="col-md-9 work-info-section">
+                <!-- Блок с основной рабочей информацией -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <h5 class="section-title">Должность</h5>
+                        <div class="detail-value">@Model.Post</div>
+                        <div class="status-period">
+                            @Model.StartDateStatus?.ToString("dd.MM.yyyy") -
+                            @Model.EndDateStatus?.ToString("dd.MM.yyyy")
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <h5 class="section-title">Отдел</h5>
+                        <div class="detail-value">@Model.Department</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <h5 class="section-title">Оклад</h5>
+                        <div class="detail-value">
+                            @(Model.Salary?.ToString("C") ?? "Не указано")
+                        </div>
+                    </div>
+                </div>
+                <hr class="divider">
+
+                <!-- Блок с обязанностями -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="section-title">Должностные обязанности</h5>
+                        <div class="detail-value">@Model.Duties</div>
+                    </div>
+                </div>
+                <hr class="divider">
+
+                <!-- Блок с рабочей информацией -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="section-title">Текущий статус</h5>
+                        <div class="detail-value">
+                            @if (!string.IsNullOrEmpty(Model.Name))
+                            {
+                                <div class="mb-2">@Model.Name</div>
+                                <div class="status-period">
+                                    @Model.StartDateWorkingConditions?.ToString("dd.MM.yyyy") -
+                                    @Model.EndDateWorkingConditions?.ToString("dd.MM.yyyy")
+                                </div>
+                            }
+                            else
+                            {
+                                <div>Активно работает</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <a asp-action="Edit" asp-route-id="@Model.IdWorker"
+           class="btn btn-primary">
+            <i class="bi bi-pencil me-2"></i>Редактировать
+        </a>
+        <a asp-action="Index"
+           class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i>К списку
+        </a>
+    </div>
+</div>
+
+<script>
+    async function uploadAvatar(input) {
+        const form = document.getElementById('avatarForm');
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData
+            });
+
+            const responseText = await response.text(); // Читаем ответ как текст для отладки
+            console.log("Raw response:", responseText);
+
+            if (!response.ok) {
+                alert("Ошибка: " + response.statusText);
+                return;
+            }
+
+            // Пытаемся распарсить ответ как JSON
+            let result;
+            try {
+                result = JSON.parse(responseText);
+            } catch (e) {
+                console.error("Ошибка парсинга JSON:", e);
+                alert("Аватар обновлен. Страница будет перезагружена.");
+                window.location.reload();
+                return;
+            }
+
+            // Проверяем наличие сообщения (с учетом регистра)
+            const successMessage = result.message || result.Message || "Аватар успешно обновлен";
+            alert(successMessage);
+
+            window.location.reload();
+
+        } catch (error) {
+            console.error("Ошибка при загрузке аватара:", error);
+            alert("Произошла ошибка при загрузке аватара.");
+        }
+    }
+</script>
