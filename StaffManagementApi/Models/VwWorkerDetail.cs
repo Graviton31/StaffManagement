@@ -31,14 +31,6 @@ public partial class VwWorkerDetail
 
     public string? Department { get; set; }
 
-    public string? Room { get; set; }
-
-    public string? Workspace { get; set; }
-
-    public string? Floor { get; set; }
-
-    public string? Office { get; set; }
-
     public string? Name { get; set; }
 
     public DateOnly? StartDateWorkingConditions { get; set; }

@@ -184,29 +184,6 @@ public class ExcelImportService
                 _context.StatusesWorkers.Update(status);
             }
 
-            // Обработка Workspace
-            if (!string.IsNullOrEmpty(workerData.WorkspaceName))
-            {
-                var workspace = await _context.Workspaces
-                    .FirstOrDefaultAsync(w => w.Name == workerData.WorkspaceName);
-
-                if (workspace != null)
-                {
-                    workspace.IdWorker = worker.IdWorker;
-                    _context.Workspaces.Update(workspace);
-                }
-                else
-                {
-                    // Создаем новое рабочее место с минимальными данными
-                    workspace = new Workspace
-                    {
-                        Name = workerData.WorkspaceName,
-                        IdWorker = worker.IdWorker
-                    };
-                    _context.Workspaces.Add(workspace);
-                }
-            }
-
             await _context.SaveChangesAsync();
         }
 

@@ -27,7 +27,7 @@ public partial class Worker
 
     public int? IdRole { get; set; }
 
-    public byte[] Password { get; set; } = null!;
+    public string Password { get; set; } = null!;
 
     public string? Token { get; set; }
 
@@ -36,6 +36,4 @@ public partial class Worker
     public virtual ICollection<StatusesWorker> StatusesWorkers { get; set; } = new List<StatusesWorker>();
 
     public virtual ICollection<WorkingCondition> WorkingConditions { get; set; } = new List<WorkingCondition>();
-
-    public virtual ICollection<Workspace> Workspaces { get; set; } = new List<Workspace>();
 }
