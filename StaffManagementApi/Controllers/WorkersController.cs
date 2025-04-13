@@ -146,6 +146,28 @@ namespace StaffManagement.Controllers
             return Ok(workerDetail); // Возвращаем 200 и детали рабочего
         }
 
+        [HttpGet("dto/{id}")]
+        public async Task<ActionResult<WorkerDto>> GetWorkerDto(int id)
+        {
+            var worker = await _context.Workers
+                .Select(w => new WorkerDto
+                {
+                    IdWorker = w.IdWorker,
+                    Name = w.Name,
+                    Surname = w.Surname,
+                    Patronymic = w.Patronymic,
+                    BirthDate = w.BirthDate,
+                    IdRole = w.IdRole,
+                    WorkEmail = w.WorkEmail,
+                    Phone = w.Phone,
+                    PcNumber = w.PcNumber
+                })
+                .FirstOrDefaultAsync(w => w.IdWorker == id);
+
+            if (worker == null) return NotFound();
+            return worker;
+        }
+
         /// <summary>
         /// Обновляет данные конкретного работника.
         /// </summary>
@@ -154,33 +176,52 @@ namespace StaffManagement.Controllers
         /// <returns>204 No Content, если успешно; иначе 400 Bad Request или 404 Not Found.</returns>
         //[Authorize(Roles = "Admin")]
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> UpdateWorker(int id, WorkerDto workerDto)
+        public async Task<IActionResult> UpdateWorker(int id, [FromBody] WorkerDto workerDto)
         {
-            // Проверка на валидность входных данных
-            if (workerDto == null)
+            try
             {
-                return BadRequest("Данные работника обязательны.");
-            }
+                if (workerDto == null || id != workerDto.IdWorker)
+                {
+                    return BadRequest("Invalid worker data");
+                }
 
-            // Поиск работника по ID
-            var worker = await _context.Workers.FindAsync(id);
-            if (worker == null)
+                var worker = await _context.Workers
+                    .FirstOrDefaultAsync(w => w.IdWorker == id);
+
+                if (worker == null)
+                {
+                    return NotFound();
+                }
+
+                // Валидация роли
+                if (workerDto.IdRole.HasValue &&
+                    !await _context.Roles.AnyAsync(r => r.IdRole == workerDto.IdRole))
+                {
+                    return BadRequest("Invalid role specified");
+                }
+
+                // Обновление только разрешенных полей
+                worker.Name = workerDto.Name ?? worker.Name;
+                worker.Surname = workerDto.Surname ?? worker.Surname;
+                worker.Patronymic = workerDto.Patronymic;
+                worker.BirthDate = workerDto.BirthDate ?? worker.BirthDate;
+                worker.WorkEmail = workerDto.WorkEmail;
+                worker.Phone = workerDto.Phone;
+                worker.PcNumber = workerDto.PcNumber;
+                worker.IdRole = workerDto.IdRole;
+
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (DbUpdateConcurrencyException ex)
             {
-                return NotFound(); // Возврат 404, если работник не найден
+                return StatusCode(StatusCodes.Status409Conflict);
             }
-
-            // Обновление данных работника
-            worker.Name = workerDto.Name ?? worker.Name;
-            worker.Surname = workerDto.Surname ?? worker.Surname;
-            worker.Patronymic = workerDto.Patronymic; // Устанавливаем значение, даже если оно null
-            worker.BirthDate = workerDto.BirthDate ?? worker.BirthDate; // Обновляем дату рождения
-            worker.WorkEmail = workerDto.WorkEmail; // Обновляем рабочий email
-            worker.Phone = workerDto.Phone; // Обновляем телефон
-            worker.PcNumber = workerDto.PcNumber; // Обновляем номер ПК
-
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         /// <summary>
@@ -243,38 +284,59 @@ namespace StaffManagement.Controllers
         {
             if (file == null || file.Length == 0)
             {
-                return BadRequest("Файл не выбран");
+                return BadRequest(new { Message = "Файл не выбран" });
             }
 
-            if (!file.FileName.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) &&
-                !file.FileName.EndsWith(".png", StringComparison.OrdinalIgnoreCase) &&
-                !file.FileName.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase))
+            var allowedExtensions = new[] { ".jpg", ".png", ".jpeg" };
+            var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+            if (!allowedExtensions.Contains(fileExtension))
             {
-                return BadRequest("Допустимы только форматы .jpg, .png, .jpeg");
+                return BadRequest(new { Message = "Допустимы только форматы .jpg, .png, .jpeg" });
             }
 
-            // Проверка существования работника
             var worker = await _context.Workers.FindAsync(workerId);
             if (worker == null)
             {
-                return NotFound("Работник не найден");
+                return NotFound(new { Message = "Работник не найден" });
             }
 
-            // Генерация уникального имени файла
-            var fileName = $"{workerId}_{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+            // Удаление старого аватара
+            if (!string.IsNullOrEmpty(worker.Avatar))
+            {
+                var oldAvatarPath = Path.Combine("wwwroot/images", worker.Avatar);
+                if (System.IO.File.Exists(oldAvatarPath))
+                {
+                    try
+                    {
+                        System.IO.File.Delete(oldAvatarPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Ошибка при удалении файла: {ex.Message}");
+                    }
+                }
+            }
+
+            // Генерация нового имени файла
+            var fileName = $"{workerId}_{DateTime.Now:yyyyMMddHHmmss}{fileExtension}";
             var filePath = Path.Combine("wwwroot/images", fileName);
 
-            // Сохранение файла
+            // Сохранение нового файла
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
             }
 
-            // Обновление пути к аватарке в базе данных
-            worker.Avatar = $"{fileName}";
+            // Обновление записи в БД
+            worker.Avatar = fileName;
             await _context.SaveChangesAsync();
 
-            return Ok("Аватарка успешно загружена");
+            return Ok(new
+            {
+                Message = "Аватар успешно обновлён",
+                NewAvatar = fileName
+            });
         }
     }
 }

@@ -4,110 +4,243 @@
     ViewData["Title"] = "Подробная информация";
 }
 
-<h1>@ViewData["Title"]</h1>
+<style>
+    /* Сохраняем оригинальные стили и добавляем новые */
+    .detail-card {
+        border: 1px solid #0057a6;
+        border-radius: 8px;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
 
-<div class="card">
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #0057a6;
+    }
+
+    .avatar-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .avatar-img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border: 2px solid #dee2e6;
+        margin-bottom: 1rem;
+    }
+
+    .section-title {
+        color: #0057a6;
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .detail-value {
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+        padding: 0 0.5rem;
+    }
+
+    .divider {
+        margin: 1.5rem 0;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .status-period {
+        font-size: 0.9em;
+        color: #6c757d;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        padding: 1.25rem;
+        background-color: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .personal-info-section {
+        border-right: 2px solid #f0f0f0;
+        padding-right: 2rem;
+    }
+
+    .work-info-section {
+        padding-left: 2rem;
+    }
+</style>
+
+<div class="card detail-card">
     <div class="card-header">
-        <h4>Информация о работнике</h4>
+        <h3 class="mb-0">@Model.FullWorkerName</h3>
     </div>
+
     <div class="card-body">
-        <div class="row">
-            <div class="col-md-4">
-                <h5>Аватар</h5>
-                <div>
+        <div class="row mb-4">
+            <div class="avatar-container">
+                <!-- Добавляем контейнер для кнопки -->
+                <div class="position-relative" style="width: 120px; height: 120px;">
                     @if (!string.IsNullOrEmpty(Model.Avatar))
                     {
-                        <img src="@Model.Avatar" alt="Avatar" class="img-fluid" style="max-width: 100px; max-height: 100px; border: 1px solid #ccc; border-radius: 5px;" />
+                        <img src="http://localhost:5298/images/@Model.Avatar"
+                             alt="Аватар"
+                             class="avatar-img rounded-circle" />
                     }
                     else
                     {
-                        <text>Нет аватара</text>
+                        <div class="avatar-img rounded-circle bg-light d-flex align-items-center justify-content-center">
+                            <img src="@Url.Content("~/images/Avatar.jpg")"
+                                 alt="Default Avatar"
+                                 class="rounded-circle"
+                                 style="width:115px;height:115px;" />
+                        </div>
                     }
+
+                    <!-- Кнопка загрузки аватара -->
+                    <form id="avatarForm"
+                          action="http://localhost:5298/api/Workers/upload-avatar/@Model.IdWorker"
+                          method="post"
+                          enctype="multipart/form-data"
+                          class="position-absolute bottom-0 end-0">
+                        <input type="hidden" name="workerId" value="@Model.IdWorker" />
+                        <label class="btn btn-primary btn-sm rounded-circle shadow-sm"
+                               style="width: 32px; height: 32px;"
+                               title="Загрузить аватар">
+                            <i class="bi bi-plus"></i>
+                            <input type="file"
+                                   name="file"
+                                   accept=".jpg,.jpeg,.png"
+                                   style="display: none;"
+                                   onchange="uploadAvatar(this)">
+                        </label>
+                    </form>
+
+                </div>
+
+                <h5 class="section-title text-center w-100">Персональные данные</h5>
+                <div class="detail-value text-center">
+                    <div class="mb-2">@Model.BirthDate.ToString("dd.MM.yyyy")</div>
+                    <div class="mb-2">@Model.Phone</div>
+                    <div>@Model.WorkEmail</div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <h5>ФИО</h5>
-                <p>@Model.FullWorkerName</p>
-            </div>
-            <div class="col-md-4">
-                <h5>Дата рождения</h5>
-                <p>@Model.BirthDate.ToString("dd.MM.yyyy")</p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <h5>Телефон</h5>
-                <p>@Model.Phone</p>
-            </div>
-            <div class="col-md-4">
-                <h5>Email</h5>
-                <p>@Model.WorkEmail</p>
-			</div>
-            <div class="col-md-4">
-				<h5>Номер ПК</h5>
-				<p>@Model.PcNumber</p>
-			</div>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <h5>Должность</h5>
-                <p>@Model.Post</p>
-            </div>
-            <div class="col-md-4">
-                <h5>Отдел</h5>
-                <p>@Model.Department</p>
-            </div>
-            <div class="col-md-4">
-                <h5>Заработная плата</h5>
-                <p>@Model.Salary</p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <h5>Обязанности</h5>
-                <p>@Model.Duties</p>
-            </div>
-            <div class="col-md-4">
-                <h5>Дата начала статуса</h5>
-                <p>@(Model.StartDateStatus?.ToString("dd.MM.yyyy") ?? "Не указана")</p>
-            </div>
-            <div class="col-md-4">
-                <h5>Дата окончания статуса</h5>
-                <p>@(Model.EndDateStatus?.ToString("dd.MM.yyyy") ?? "Не указана")</p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <h5>Комната</h5>
-                <p>@Model.Room</p>
-            </div>
-            <div class="col-md-4">
-                <h5>Этаж</h5>
-                <p>@Model.Floor</p>
-            </div>
-            <div class="col-md-4">
-                <h5>Офис</h5>
-                <p>@Model.Office</p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <h5>Статус</h5>
-                <p>@Model.Name</p> 
-            </div>
-            <div class="col-md-4">
-                <h5>Дата начала условий труда</h5>
-                <p>@(Model.StartDateWorkingConditions?.ToString("dd.MM.yyyy") ?? "Не указана")</p>
-            </div>
-            <div class="col-md-4">
-                <h5>Дата окончания условий труда</h5>
-                @(Model.EndDateWorkingConditions?.ToString("dd.MM.yyyy") ?? "Не указана")</p>
+
+            <!-- Правая колонка с рабочей информацией -->
+            <div class="col-md-9 work-info-section">
+                <!-- Блок с основной рабочей информацией -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <h5 class="section-title">Должность</h5>
+                        <div class="detail-value">@Model.Post</div>
+                        <div class="status-period">
+                            @Model.StartDateStatus?.ToString("dd.MM.yyyy") -
+                            @Model.EndDateStatus?.ToString("dd.MM.yyyy")
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <h5 class="section-title">Отдел</h5>
+                        <div class="detail-value">@Model.Department</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <h5 class="section-title">Оклад</h5>
+                        <div class="detail-value">
+                            @(Model.Salary?.ToString("C") ?? "Не указано")
+                        </div>
+                    </div>
+                </div>
+                <hr class="divider">
+
+                <!-- Блок с обязанностями -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="section-title">Должностные обязанности</h5>
+                        <div class="detail-value">@Model.Duties</div>
+                    </div>
+                </div>
+                <hr class="divider">
+
+                <!-- Блок с рабочей информацией -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="section-title">Текущий статус</h5>
+                        <div class="detail-value">
+                            @if (!string.IsNullOrEmpty(Model.Name))
+                            {
+                                <div class="mb-2">@Model.Name</div>
+                                <div class="status-period">
+                                    @Model.StartDateWorkingConditions?.ToString("dd.MM.yyyy") -
+                                    @Model.EndDateWorkingConditions?.ToString("dd.MM.yyyy")
+                                </div>
+                            }
+                            else
+                            {
+                                <div>Активно работает</div>
+                            }
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<div class="card-footer text-right">
-    <a asp-action="Edit" asp-route-id="@Model.IdWorker" class="btn btn-primary">Редактировать</a>
-    <a asp-action="Index" class="btn btn-secondary">Назад к списку</a>
+
+    <div class="action-buttons">
+        <a asp-action="Edit" asp-route-id="@Model.IdWorker"
+           class="btn btn-primary">
+            <i class="bi bi-pencil me-2"></i>Редактировать
+        </a>
+        <a asp-action="Index"
+           class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i>К списку
+        </a>
+    </div>
 </div>
 
+<script>
+    async function uploadAvatar(input) {
+        const form = document.getElementById('avatarForm');
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData
+            });
+
+            const responseText = await response.text(); // Читаем ответ как текст для отладки
+            console.log("Raw response:", responseText);
+
+            if (!response.ok) {
+                alert("Ошибка: " + response.statusText);
+                return;
+            }
+
+            // Пытаемся распарсить ответ как JSON
+            let result;
+            try {
+                result = JSON.parse(responseText);
+            } catch (e) {
+                console.error("Ошибка парсинга JSON:", e);
+                alert("Аватар обновлен. Страница будет перезагружена.");
+                window.location.reload();
+                return;
+            }
+
+            // Проверяем наличие сообщения (с учетом регистра)
+            const successMessage = result.message || result.Message || "Аватар успешно обновлен";
+            alert(successMessage);
+
+            window.location.reload();
+
+        } catch (error) {
+            console.error("Ошибка при загрузке аватара:", error);
+            alert("Произошла ошибка при загрузке аватара.");
+        }
+    }
+</script>

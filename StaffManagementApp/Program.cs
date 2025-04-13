@@ -1,8 +1,14 @@
+using Microsoft.EntityFrameworkCore;
+using StaffManagementApi.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Добавление контекста базы данных с использованием строки подключения
+builder.Services.AddDbContext<ContextStaffManagement>(options =>
+    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"), ServerVersion.Parse("8.0.19-mysql")));
 // Регистрация HttpClient
 builder.Services.AddHttpClient("ApiClient", client =>
 {

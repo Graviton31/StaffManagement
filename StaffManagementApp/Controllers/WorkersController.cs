@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using StaffManagementApi.Models;
 using StaffManagementApi.ModelsDto;
 using System.Text.Json;
@@ -14,15 +15,15 @@ namespace StaffManagementApp.Controllers
             _httpClient = clientFactory.CreateClient("ApiClient");
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10)
         {
             try
             {
-                var response = await _httpClient.GetAsync("api/Workers");
+                var response = await _httpClient.GetAsync($"api/Workers?pageNumber={pageNumber}&pageSize={pageSize}");
                 if (response.IsSuccessStatusCode)
                 {
-                    var vwWorkerInfo = await response.Content.ReadFromJsonAsync<IEnumerable<VwWorkerInfo>>();
-                    return View(vwWorkerInfo);
+                    var pagedResponse = await response.Content.ReadFromJsonAsync<PagedResponse<VwWorkerInfo>>();
+                    return View(pagedResponse);
                 }
                 else
                 {
@@ -34,7 +35,7 @@ namespace StaffManagementApp.Controllers
                 Console.WriteLine($"Ошибка: {ex.Message}");
             }
 
-            return View(new List<VwWorkerInfo>());
+            return View(new PagedResponse<VwWorkerInfo> { Data = new List<VwWorkerInfo>() });
         }
 
 
@@ -60,6 +61,65 @@ namespace StaffManagementApp.Controllers
                 return View(worker);
             }
             return NotFound();
+        }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/Workers/dto/{id}");
+                response.EnsureSuccessStatusCode();
+
+                // Десериализуем ответ API в WorkerDto
+                var workerDto = await response.Content.ReadFromJsonAsync<WorkerDto>();
+
+                await LoadRolesAsync();
+                return View(workerDto);
+            }
+            catch
+            {
+                return NotFound();
+            }
+        }
+
+        private async Task LoadRolesAsync()
+        {
+            var rolesResponse = await _httpClient.GetAsync("api/Roles");
+            if (rolesResponse.IsSuccessStatusCode)
+            {
+                var roles = await rolesResponse.Content.ReadFromJsonAsync<List<Role>>();
+                ViewBag.Roles = new SelectList(roles, "IdRole", "Name"); 
+            }
+        }
+
+        // POST: Workers/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("IdWorker,Surname,Name,Patronymic,BirthDate,IdRole,WorkEmail,Phone,PcNumber")] WorkerDto workerDto)
+        {
+            if (id != workerDto.IdWorker)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                var response = await _httpClient.PutAsJsonAsync($"api/Workers/update/{id}", workerDto);
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                ModelState.AddModelError("", "Ошибка при обновлении. Проверьте данные.");
+            }
+
+            // Повторная загрузка ролей при ошибке
+            var rolesResponse = await _httpClient.GetAsync("api/Roles");
+            if (rolesResponse.IsSuccessStatusCode)
+            {
+                var roles = await rolesResponse.Content.ReadFromJsonAsync<List<Role>>();
+                ViewBag.Roles = new SelectList(roles, "IdRole", "Name", workerDto.IdRole);
+            }
+            return View(workerDto);
         }
     }
 }

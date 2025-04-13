@@ -14,6 +14,18 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ContextStaffManagement>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"), ServerVersion.Parse("8.0.19-mysql")));
 
+// Настройка CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:5286") // URL клиентского приложения
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+});
+
 // Настройка аутентификации JWT
 var key = builder.Configuration["JwtSettings:SecretKey"]; // Секретный ключ для JWT
 
@@ -58,8 +70,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("AllowSpecificOrigin");
+app.UseStaticFiles(); // Разрешает доступ к wwwroot
 
+// Правильный порядок middleware
+app.UseRouting();
+app.UseCors("AllowSpecificOrigin");
+app.UseAuthentication(); // Добавлено отсутствующее middleware
 app.UseAuthorization();
 
 app.MapControllers();
