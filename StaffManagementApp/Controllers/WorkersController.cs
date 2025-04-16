@@ -107,7 +107,7 @@ namespace StaffManagementApp.Controllers
                 var response = await _httpClient.PutAsJsonAsync($"api/Workers/update/{id}", workerDto);
                 if (response.IsSuccessStatusCode)
                 {
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction("Details", new { id = workerDto.IdWorker });
                 }
                 ModelState.AddModelError("", "Ошибка при обновлении. Проверьте данные.");
             }
@@ -119,7 +119,7 @@ namespace StaffManagementApp.Controllers
                 var roles = await rolesResponse.Content.ReadFromJsonAsync<List<Role>>();
                 ViewBag.Roles = new SelectList(roles, "IdRole", "Name", workerDto.IdRole);
             }
-            return View(workerDto);
+            return RedirectToAction("Details", new { id = workerDto.IdWorker});
         }
     }
 }

@@ -14,7 +14,6 @@ namespace StaffManagementApi.ModelsDto
         [Display(Name = "Фамилия")]
         public string? Surname { get; set; } = null!;
 
-        [Required(ErrorMessage = "Обязательное поле")]
         [Display(Name = "Отчество")]
         public string? Patronymic { get; set; }
 
@@ -30,11 +29,9 @@ namespace StaffManagementApi.ModelsDto
         [Display(Name = "Рабочая почта")]
         public string? WorkEmail { get; set; }
 
-        [Required(ErrorMessage = "Обязательное поле")]
         [Display(Name = "Телефон")]
         public string? Phone { get; set; }
 
-        [Required(ErrorMessage = "Обязательное поле")]
         [Display(Name = "Номер ПК")]
         public string? PcNumber { get; set; }
     }
